@@ -214,6 +214,40 @@ MiniStar.prototype.update = function () {
   this.x += this.velocity.x;
   this.ttl -= 1;
   this.opacity -= 1 / this.ttl;
+};
+
+function Rocket() {
+  this.rocketImage = new Image();
+  this.rocketDirection = Math.random() < 0.5 ? 'ltr' : 'rtl';
+  this.rocketVelocity = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(1, 3);
+  this.rocketYPos = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(canvas.height / 2, canvas.height - groundHeight - 50);
+  this.rocketImage.src = this.rocketDirection === 'ltr' ? 'rocket.svg' : 'rocket-reverse.svg';
+  this.x = this.rocketDirection === 'ltr' ? -100 : canvas.width + 100;
+  this.y = this.rocketYPos;
+  this.velocity = {
+    x: this.rocketDirection === 'ltr' ? this.rocketVelocity : -this.rocketVelocity,
+    y: this.rocketVelocity
+  };
+  this.timeOutOfTheScreen = 0;
+  this.rocketPauseTime = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(150, 300);
+}
+
+Rocket.prototype.draw = function () {
+  c.drawImage(this.rocketImage, this.x, this.y, 20, 20);
+};
+
+Rocket.prototype.update = function () {
+  this.draw();
+  this.x += this.velocity.x;
+  this.y -= this.velocity.y;
+
+  if (this.y < 0) {
+    if (this.timeOutOfTheScreen < this.rocketPauseTime) {
+      this.timeOutOfTheScreen++;
+    } else {
+      rocket = new Rocket();
+    }
+  }
 }; // Implementation
 
 
@@ -224,6 +258,7 @@ var ticker = 0;
 var groundHeight = 100;
 var moon;
 var moonToggle = Math.random() > 0.7;
+var rocket = new Rocket();
 
 function init() {
   stars = [];
@@ -270,6 +305,7 @@ function animate() {
   });
   c.fillStyle = 'black';
   c.fillRect(0, canvas.height - groundHeight, canvas.width, canvas.height);
+  rocket.update();
   stars.forEach(function (star, index) {
     star.update();
 
