@@ -110,7 +110,15 @@ addEventListener('resize', function () {
   init();
 }); // Objects
 
-function Star(x, y, radius, color) {
+function Star(_ref) {
+  var _ref$x = _ref.x,
+      x = _ref$x === void 0 ? 0 : _ref$x,
+      _ref$y = _ref.y,
+      y = _ref$y === void 0 ? 0 : _ref$y,
+      _ref$radius = _ref.radius,
+      radius = _ref$radius === void 0 ? 30 : _ref$radius,
+      _ref$color = _ref.color,
+      color = _ref$color === void 0 ? '#fff' : _ref$color;
   this.x = x;
   this.y = y;
   this.radius = radius;
@@ -142,7 +150,11 @@ Star.prototype.update = function () {
     this.velocity.y = -this.velocity.y * this.friction;
 
     for (var i = 0; i < 8; i++) {
-      miniStars.push(new MiniStar(this.x, this.y, 2));
+      miniStars.push(new MiniStar({
+        x: this.x,
+        y: this.y,
+        radius: 2
+      }));
     }
 
     this.radius -= 3;
@@ -154,8 +166,19 @@ Star.prototype.update = function () {
   this.x += this.velocity.x;
 };
 
-function MiniStar(x, y, radius, color) {
-  Star.call(this, x, y, radius, color);
+function MiniStar(_ref2) {
+  var _ref2$x = _ref2.x,
+      x = _ref2$x === void 0 ? 0 : _ref2$x,
+      _ref2$y = _ref2.y,
+      y = _ref2$y === void 0 ? 0 : _ref2$y,
+      _ref2$radius = _ref2.radius,
+      radius = _ref2$radius === void 0 ? 30 : _ref2$radius,
+      _ref2$color = _ref2.color,
+      color = _ref2$color === void 0 ? '#fff' : _ref2$color;
+  this.x = x;
+  this.y = y;
+  this.radius = radius;
+  this.color = color;
   this.velocity = {
     x: _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(-5, 5),
     y: _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(-15, 15)
@@ -199,18 +222,36 @@ var miniStars;
 var staticStars;
 var ticker = 0;
 var groundHeight = 100;
+var moon;
+var moonToggle = Math.random() > 0.7;
 
 function init() {
   stars = [];
   miniStars = [];
   staticStars = [];
-  stars.push(new Star(canvas.width / 2, 30, 15, 'white'));
+  moon = new Star({
+    x: _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.width),
+    y: _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.height - 300),
+    radius: _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(50, 90),
+    color: '#fff'
+  });
+  stars.push(new Star({
+    width: canvas.width / 2,
+    height: 30,
+    radius: 15,
+    color: 'white'
+  }));
 
-  for (var i = 0; i < 20; i++) {
+  for (var i = 0; i < 60; i++) {
     var xPos = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.width);
-    var yPos = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.height);
-    var radius = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0.5, 4);
-    staticStars.push(new Star(xPos, yPos, radius, 'white'));
+    var yPos = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.height) - 200;
+    var radius = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0.5, 3);
+    staticStars.push(new Star({
+      x: xPos,
+      y: yPos,
+      radius: radius,
+      color: 'white'
+    }));
   }
 } // Animation Loop
 
@@ -223,6 +264,7 @@ function animate() {
   bgGradient.addColorStop(1, '#402b70');
   c.fillStyle = bgGradient;
   c.fillRect(0, 0, canvas.width, canvas.height);
+  if (moonToggle) moon.draw();
   staticStars.forEach(function (staticStar) {
     staticStar.draw();
   });
@@ -243,10 +285,25 @@ function animate() {
     }
   });
 
-  if (ticker % 75 === 0) {
-    var xPos = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.width); // stars.push(new Star(xPos, 0, radius, 'white'));
+  if (ticker % _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(75, 200) === 0) {
+    var xPos = _utils__WEBPACK_IMPORTED_MODULE_0___default.a.randomIntFromRange(0, canvas.width);
+    var starWidth;
+    var starWidthHelper = Math.random();
 
-    stars.push(new Star(xPos, 0, 12, 'white'));
+    if (starWidthHelper < 0.3) {
+      starWidth = 9;
+    } else if (starWidthHelper > 0.3 && starWidthHelper < 0.6) {
+      starWidth = 12;
+    } else {
+      starWidth = 15;
+    }
+
+    stars.push(new Star({
+      x: xPos,
+      y: 0,
+      radius: starWidth,
+      color: 'white'
+    }));
   }
 
   ticker++;

@@ -17,7 +17,7 @@ addEventListener('resize', () => {
 })
 
 // Objects
-function Star(x, y, radius, color) {
+function Star({x = 0, y = 0, radius = 30, color = '#fff'}) {
   this.x = x
   this.y = y
   this.radius = radius
@@ -48,7 +48,7 @@ Star.prototype.update = function () {
   if (this.y + this.radius + this.velocity.y > window.innerHeight - groundHeight) {
     this.velocity.y = -this.velocity.y * this.friction;
     for (let i = 0; i < 8; i++) {
-      miniStars.push(new MiniStar(this.x, this.y, 2));
+      miniStars.push(new MiniStar({x: this.x, y: this.y, radius: 2}));
     }
     this.radius -= 3;
   } else {
@@ -59,8 +59,11 @@ Star.prototype.update = function () {
   this.x += this.velocity.x;
 }
 
-function MiniStar(x, y, radius, color) {
-  Star.call(this, x, y, radius, color);
+function MiniStar({x = 0, y = 0, radius = 30, color = '#fff'}) {
+  this.x = x
+  this.y = y
+  this.radius = radius
+  this.color = color
   this.velocity = {
     x: utils.randomIntFromRange(-5, 5),
     y: utils.randomIntFromRange(-15, 15),
@@ -104,19 +107,39 @@ let miniStars;
 let staticStars;
 let ticker = 0;
 let groundHeight = 100;
+let moon;
+const moonToggle = Math.random() > 0.7;
+
 function init() {
   stars = []
   miniStars = []
   staticStars = []
+  
+  moon = new Star({
+    x: utils.randomIntFromRange(0, canvas.width), 
+    y: utils.randomIntFromRange(0, canvas.height - 300), 
+    radius: utils.randomIntFromRange(50, 90), 
+    color: '#fff'
+  });
 
-  stars.push(new Star(canvas.width / 2, 30, 15, 'white'));
+  stars.push(new Star({
+    width: canvas.width / 2, 
+    height: 30, 
+    radius: 15, 
+    color: 'white'})
+  );
 
-  for ( let i = 0; i < 20; i++ ) {
+  for ( let i = 0; i < 60; i++ ) {
     const xPos = utils.randomIntFromRange(0, canvas.width);
-    const yPos = utils.randomIntFromRange(0, canvas.height);
-    const radius = utils.randomIntFromRange(0.5, 4);
+    const yPos = utils.randomIntFromRange(0, canvas.height) - 200;
+    const radius = utils.randomIntFromRange(0.5, 3);
 
-    staticStars.push(new Star(xPos, yPos, radius, 'white'));
+    staticStars.push(new Star({
+      x: xPos, 
+      y: yPos, 
+      radius: radius, 
+      color: 'white'})
+    );
   }
 }
 
@@ -130,6 +153,8 @@ function animate() {
 
   c.fillStyle = bgGradient;
   c.fillRect(0, 0, canvas.width, canvas.height);
+
+  if ( moonToggle ) moon.draw();
 
   staticStars.forEach(staticStar => {
     staticStar.draw();
@@ -153,10 +178,22 @@ function animate() {
   });
 
 
-  if ( ticker % 75 === 0 ) {
+  if ( ticker % utils.randomIntFromRange(75, 200) === 0 ) {
     const xPos = utils.randomIntFromRange(0, canvas.width);
-    // stars.push(new Star(xPos, 0, radius, 'white'));
-    stars.push(new Star(xPos, 0, 12, 'white'));
+    let starWidth;
+    const starWidthHelper = Math.random();
+
+    if ( starWidthHelper < 0.3 ) {
+      starWidth = 9;
+    } else if ( starWidthHelper > 0.3 && starWidthHelper < 0.6 ) {
+      starWidth = 12;
+    } else {
+      starWidth = 15;
+    }
+    
+    stars.push(new Star({
+      x: xPos, y: 0, radius: starWidth, color: 'white'
+    }));
   }
 
   ticker++;
